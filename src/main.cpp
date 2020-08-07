@@ -100,7 +100,7 @@ int main() {
           /* If car has to visit a points every 0.02 seconds then in 1 second there
           should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
           then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
-          double dist_inc = 0.5;
+          double dist_inc = 0.4;
           for (int i = 0; i < 50; ++i) {
               /* To stay in the lanes Frenet co-ordinates are very useful */
               /* We get the next iteration, otherwise our first point will be exactly where
