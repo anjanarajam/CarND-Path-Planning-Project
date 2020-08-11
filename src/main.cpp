@@ -127,7 +127,7 @@ int main() {
               next_x_vals.push_back(xy[0]);
               next_y_vals.push_back(xy[1]);
           }
-#if 1
+#if 0
           /* Start in lane 1 which is the middle lane; left lane is 0 */
           int lane = 1;
 
