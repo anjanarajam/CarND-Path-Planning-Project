@@ -27,7 +27,8 @@ int main() {
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
-  // The max s value before wrapping around the track back to 0
+  // The max s value before wrapping around the track back to 0 -
+  // max length of the track
   double max_s = 6945.554;
 
   std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
@@ -43,6 +44,7 @@ int main() {
     iss >> x;
     iss >> y;
     iss >> s;
+    //normal component of way point
     iss >> d_x;
     iss >> d_y;
     map_waypoints_x.push_back(x);
@@ -71,7 +73,7 @@ int main() {
         if (event == "telemetry") {
           // j[1] is the data JSON object
           
-          // Main car's localization Data
+          // Main car's localization Data - these values come from the simulator
           double car_x = j[1]["x"];
           double car_y = j[1]["y"];
           double car_s = j[1]["s"];
@@ -93,6 +95,9 @@ int main() {
           json msgJson;
 
           // My Code starts here  
+
+          //way points are the points on the map. we can find the closest waypoint 
+          //closest waypoint could be behind the car but next waypoint could be where to go next
           /* Actual path planner points */
           vector<double> next_x_vals;
           vector<double> next_y_vals;
@@ -104,24 +109,24 @@ int main() {
           /* If car has to visit a points every 0.02 seconds then in 1 second there
           should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
           then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
-          double dist_inc = 0.4;
-          for (int i = 0; i < 50; ++i) {
-              /* To stay in the lanes Frenet co-ordinates are very useful */
-              /* We get the next iteration, otherwise our first point will be exactly where
-              car is at and we would not be transitioning */
-              double next_s = car_s + (i + 1) * dist_inc;
-              /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
-              since we are in the middle of the middle lane, so we are 6m from the double yellow
-              lane from the side of left lane*/
-              /* In other words we are 1 and a half lanes from the way points */
-              double next_d = 6;
+          //double dist_inc = 0.4;
+          //for (int i = 0; i < 50; ++i) {
+          //    /* To stay in the lanes Frenet co-ordinates are very useful */
+          //    /* We get the next iteration, otherwise our first point will be exactly where
+          //    car is at and we would not be transitioning */
+          //    double next_s = car_s + (i + 1) * dist_inc;
+          //    /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
+          //    since we are in the middle of the middle lane, so we are 6m from the double yellow
+          //    lane from the side of left lane*/
+          //    /* In other words we are 1 and a half lanes from the way points */
+          //    double next_d = 6;
 
-              /* Now lets transform s and d values to x and y cordinates */
-              std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          //    /* Now lets transform s and d values to x and y cordinates */
+          //    std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 
-              next_x_vals.push_back(xy[0]);
-              next_y_vals.push_back(xy[1]);
-          }
+          //    next_x_vals.push_back(xy[0]);
+          //    next_y_vals.push_back(xy[1]);
+          //}
 
           /* Start in lane 1 which is the middle lane; left lane is 0 */
           int lane = 1;
