@@ -21,6 +21,6 @@ link_directories(/usr/local/Cellar/libuv/1.11.0/lib)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
 
 
-add_executable(path_planning ${sources})
+add_executable(path_planning ${sources} "src/spline.h")
 
 target_link_libraries(path_planning z ssl uv uWS)

@@ -7,6 +7,8 @@
 #include "Eigen-3.3/Eigen/QR"
 #include "helpers.h"
 #include "json.hpp"
+#include "spline.h"
+#include <math.h>
 
 // for convenience
 using nlohmann::json;
@@ -90,6 +92,8 @@ int main() {
 
           json msgJson;
 
+          // My Code starts here  
+          /* Actual path planner points */
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
@@ -117,6 +121,128 @@ int main() {
 
               next_x_vals.push_back(xy[0]);
               next_y_vals.push_back(xy[1]);
+          }
+
+          /* Start in lane 1 which is the middle lane; left lane is 0 */
+          int lane = 1;
+
+          /* Set some reference velocity in MPH - taken 49.5 since we dont want to
+          cross 50 MPH */
+          double ref_vel = 49.5;
+
+          /* Create a widely spaced vector points spaced at 30m each, later we will
+          interpolate these points with spline and fill in more points */
+          std::vector<double > points_x{};
+          std::vector<double > points_y{};
+
+          /* Create reference variable for x , y and yaw. they could be either the
+          starting point of the car or the end point of the previous path */
+          double ref_x = car_x;
+          double ref_y = car_y;
+          double ref_yaw = deg2rad(car_yaw);
+
+          /* Get the size of the previous path vector. The simulator
+          actually gives the previous path */
+          int prev_size = previous_path_x.size();
+
+          /* Check whether the previous car state is nearly empty or has some points */
+          if (prev_size < 2) {
+              double previous_car_x = car_x - cos(car_yaw);
+              double previous_car_y = car_y - sin(car_yaw);
+
+              /* Use two points that make path tangent to the car */
+              points_x.push_back(previous_car_x);
+              points_x.push_back(car_x);
+
+              points_y.push_back(previous_car_y);
+              points_y.push_back(car_y);
+              /* Use the previous path's end point as the reference */
+          }
+          else {
+              /* Redefine reference state as the end point of the previous path */
+              ref_x = previous_path_x[prev_size - 1];
+              ref_y = previous_path_y[prev_size - 1];
+
+              double ref_x_prev = previous_path_x[prev_size - 2];
+              double ref_y_prev = previous_path_y[prev_size - 2];
+              /* Calculate the angle based on the previous points */
+              ref_yaw = atan2(ref_y - ref_x_prev, ref_x - ref_x_prev);
+
+              points_x.push_back(ref_x_prev);
+              points_x.push_back(ref_x);
+
+              points_y.push_back(ref_y_prev);
+              points_y.push_back(ref_y);
+          }
+
+          std::vector<double> next_wp0 = getXY(car_s + 30, (2 + 4 * lane), map_waypoints_s,
+              map_waypoints_x, map_waypoints_y);
+          std::vector<double> next_wp1 = getXY(car_s + 60, (2 + 4 * lane), map_waypoints_s,
+              map_waypoints_x, map_waypoints_y);
+          std::vector<double> next_wp2 = getXY(car_s + 90, (2 + 4 * lane), map_waypoints_s,
+              map_waypoints_x, map_waypoints_y);
+
+          points_x.push_back(next_wp0[0]);
+          points_x.push_back(next_wp1[0]);
+          points_x.push_back(next_wp2[0]);
+
+          points_y.push_back(next_wp0[1]);
+          points_y.push_back(next_wp1[1]);
+          points_y.push_back(next_wp2[1]);
+
+          for (int i = 0; i < points_x.size(); i++) {
+              /*Shift car reference angle to 0 degrees */
+              double shift_x = points_x[i] - ref_x;
+              double shift_y = points_y[i] - ref_y;
+
+              /* Transform to local cordinates */
+              points_x[i] = (shift_x * cos(0 - ref_yaw) - shift_y * sin(0 - ref_yaw));
+              points_y[i] = (shift_x * sin(0 - ref_yaw) + shift_y * cos(0 - ref_yaw));
+          }
+
+          /* Create a spline */
+          tk::spline s;
+
+          /* Set some points in the spline */
+          s.set_points(points_x, points_y);
+
+          /* Start adding the previous points to the path planner */
+          /* Instead of recreating points from the scratch, add points
+          left from the previous path */
+          for (int i = 0; i < previous_path_x.size(); i++) {
+              next_x_vals.push_back(previous_path_x[i]);
+              next_y_vals.push_back(previous_path_y[i]);
+          }
+
+          double target_x = 30;
+          double target_y = s(target_x);
+          double target_dist = sqrt(target_x * target_x + target_y * target_y);
+
+          double x_add_on = 0;
+
+          ///Here we are dealing with two different types of points : one is the widely spaced 
+          ///spline points points_x and points_y, which are first five anchor points and not previous path points.
+          ///The other one(next_x_vals) is the previous path points 
+
+          for (int i = 0; i < (50 - previous_path_x.size()); i++) {
+              /* Dividing by 2.24 since it has to m/sec */
+              double N = (target_dist / (0.2 * ref_vel / 2.24));
+              /* Adding on the number of hash marks on x-axis starting with 0 */
+              double x_point = x_add_on + target_x / N;
+              double y_point = s(x_point);
+
+              double x_ref = x_point;
+              double y_ref = y_point;
+
+              /* Transform back to global co-ordinates */
+              x_point = (x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw));
+              y_point = (x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw));
+
+              x_point += x_ref;
+              y_point += y_ref;
+
+              next_x_vals.push_back(x_point);
+              next_x_vals.push_back(y_point);
           }
 
           msgJson["next_x"] = next_x_vals;
