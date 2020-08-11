@@ -109,25 +109,25 @@ int main() {
           /* If car has to visit a points every 0.02 seconds then in 1 second there
           should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
           then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
-          double dist_inc = 0.4;
-          for (int i = 0; i < 50; ++i) {
-              /* To stay in the lanes Frenet co-ordinates are very useful */
-              /* We get the next iteration, otherwise our first point will be exactly where
-              car is at and we would not be transitioning */
-              double next_s = car_s + (i + 1) * dist_inc;
-              /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
-              since we are in the middle of the middle lane, so we are 6m from the double yellow
-              lane from the side of left lane*/
-              /* In other words we are 1 and a half lanes from the way points */
-              double next_d = 6;
+          //double dist_inc = 0.4;
+          //for (int i = 0; i < 50; ++i) {
+          //    /* To stay in the lanes Frenet co-ordinates are very useful */
+          //    /* We get the next iteration, otherwise our first point will be exactly where
+          //    car is at and we would not be transitioning */
+          //    double next_s = car_s + (i + 1) * dist_inc;
+          //    /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
+          //    since we are in the middle of the middle lane, so we are 6m from the double yellow
+          //    lane from the side of left lane*/
+          //    /* In other words we are 1 and a half lanes from the way points */
+          //    double next_d = 6;
 
-              /* Now lets transform s and d values to x and y cordinates */
-              std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          //    /* Now lets transform s and d values to x and y cordinates */
+          //    std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 
-              next_x_vals.push_back(xy[0]);
-              next_y_vals.push_back(xy[1]);
-          }
-#if 0
+          //    next_x_vals.push_back(xy[0]);
+          //    next_y_vals.push_back(xy[1]);
+          //}
+#if 1
           /* Start in lane 1 which is the middle lane; left lane is 0 */
           int lane = 1;
 
