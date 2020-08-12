@@ -237,6 +237,8 @@ int main() {
               double x_point = x_add_on + (target_x) / N;
               double y_point = s(x_point);
 
+              x_add_on = x_point;
+
               double x_ref = x_point;
               double y_ref = y_point;
 
