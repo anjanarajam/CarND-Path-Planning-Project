@@ -54,8 +54,15 @@ int main() {
     map_waypoints_dy.push_back(d_y);
   }
 
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
-               &map_waypoints_dx,&map_waypoints_dy]
+  /* Start in lane 1 which is the middle lane; left lane is 0 */
+  int lane = 1;
+
+  /* Set some reference velocity in MPH - taken 49.5 since we dont want to
+  cross 50 MPH */
+  double ref_vel = 49.5;
+
+  h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
+               &map_waypoints_dx,&map_waypoints_dy, &lane]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -92,53 +99,46 @@ int main() {
           //   of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];
 
-          json msgJson;
-
           // My Code starts here  
 
           //way points are the points on the map. we can find the closest waypoint 
           //closest waypoint could be behind the car but next waypoint could be where to go next
           /* Actual path planner points */
-          vector<double> next_x_vals;
-          vector<double> next_y_vals;
 
-          /**
-           * TODO: define a path made up of (x,y) points that the car will visit
-           *   sequentially every .02 seconds
-           */
-          /* If car has to visit a points every 0.02 seconds then in 1 second there
-          should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
-          then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
-          double dist_inc = 0.4;
-          for (int i = 0; i < 50; ++i) {
-              /* To stay in the lanes Frenet co-ordinates are very useful */
-              /* We get the next iteration, otherwise our first point will be exactly where
-              car is at and we would not be transitioning */
-              double next_s = car_s + (i + 1) * dist_inc;
-              /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
-              since we are in the middle of the middle lane, so we are 6m from the double yellow
-              lane from the side of left lane*/
-              /* In other words we are 1 and a half lanes from the way points */
-              double next_d = 6;
+          /* Get the size of the previous path vector. The simulator
+          actually gives the previous path */
+          int prev_size = previous_path_x.size();
 
-              /* Now lets transform s and d values to x and y cordinates */
-              std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          ///**
+          // * TODO: define a path made up of (x,y) points that the car will visit
+          // *   sequentially every .02 seconds
+          // */
+          ///* If car has to visit a points every 0.02 seconds then in 1 second there
+          //should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
+          //then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
+          //double dist_inc = 0.4;
+          //for (int i = 0; i < 50; ++i) {
+          //    /* To stay in the lanes Frenet co-ordinates are very useful */
+          //    /* We get the next iteration, otherwise our first point will be exactly where
+          //    car is at and we would not be transitioning */
+          //    double next_s = car_s + (i + 1) * dist_inc;
+          //    /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
+          //    since we are in the middle of the middle lane, so we are 6m from the double yellow
+          //    lane from the side of left lane*/
+          //    /* In other words we are 1 and a half lanes from the way points */
+          //    double next_d = 6;
 
-              next_x_vals.push_back(xy[0]);
-              next_y_vals.push_back(xy[1]);
-          }
+          //    /* Now lets transform s and d values to x and y cordinates */
+          //    std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+
+          //    next_x_vals.push_back(xy[0]);
+          //    next_y_vals.push_back(xy[1]);
+          //}
 #if 1
-          /* Start in lane 1 which is the middle lane; left lane is 0 */
-          int lane = 1;
-
-          /* Set some reference velocity in MPH - taken 49.5 since we dont want to
-          cross 50 MPH */
-          double ref_vel = 49.5;
-
           /* Create a widely spaced vector points spaced at 30m each, later we will
           interpolate these points with spline and fill in more points */
-          std::vector<double > points_x{};
-          std::vector<double > points_y{};
+          std::vector<double> points_x{};
+          std::vector<double> points_y{};
 
           /* Create reference variable for x , y and yaw. they could be either the
           starting point of the car or the end point of the previous path */
@@ -146,9 +146,6 @@ int main() {
           double ref_y = car_y;
           double ref_yaw = deg2rad(car_yaw);
 
-          /* Get the size of the previous path vector. The simulator
-          actually gives the previous path */
-          int prev_size = previous_path_x.size();
 
           /* Check whether the previous car state is nearly empty or has some points */
           if (prev_size < 2) {
@@ -211,6 +208,9 @@ int main() {
           /* Set some points in the spline */
           s.set_points(points_x, points_y);
 
+          vector<double> next_x_vals;
+          vector<double> next_y_vals;
+
           /* Start adding the previous points to the path planner */
           /* Instead of recreating points from the scratch, add points
           left from the previous path */
@@ -250,6 +250,9 @@ int main() {
               next_x_vals.push_back(y_point);
           }
 #endif
+
+          json msgJson; 
+
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
 
