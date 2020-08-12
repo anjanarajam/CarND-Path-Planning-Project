@@ -168,7 +168,7 @@ int main() {
               double ref_x_prev = previous_path_x[prev_size - 2];
               double ref_y_prev = previous_path_y[prev_size - 2];
               /* Calculate the angle based on the previous points */
-              ref_yaw = atan2(ref_y - ref_x_prev, ref_x - ref_x_prev);
+              ref_yaw = atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
 
               points_x.push_back(ref_x_prev);
               points_x.push_back(ref_x);
