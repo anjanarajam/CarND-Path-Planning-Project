@@ -250,7 +250,7 @@ int main() {
               y_point += y_ref;
 
               next_x_vals.push_back(x_point);
-              next_x_vals.push_back(y_point);
+              next_y_vals.push_back(y_point);
           }
 #endif
 
