@@ -208,8 +208,8 @@ int main() {
           /* Set some points in the spline */
           s.set_points(points_x, points_y);
 
-          vector<double> next_x_vals;
-          vector<double> next_y_vals;
+          std::vector<double> next_x_vals;
+          std::vector<double> next_y_vals;
 
           /* Start adding the previous points to the path planner */
           /* Instead of recreating points from the scratch, add points
@@ -219,6 +219,7 @@ int main() {
               next_y_vals.push_back(previous_path_y[i]);
           }
 
+          /* calculate how to break up spline points */
           double target_x = 30;
           double target_y = s(target_x);
           double target_dist = sqrt(target_x * target_x + target_y * target_y);
@@ -231,9 +232,9 @@ int main() {
 
           for (int i = 0; i < (50 - previous_path_x.size()); i++) {
               /* Dividing by 2.24 since it has to m/sec */
-              double N = (target_dist / (0.2 * ref_vel / 2.24));
+              double N = (target_dist / (0.02 * ref_vel / 2.24));
               /* Adding on the number of hash marks on x-axis starting with 0 */
-              double x_point = x_add_on + target_x / N;
+              double x_point = x_add_on + (target_x) / N;
               double y_point = s(x_point);
 
               double x_ref = x_point;
