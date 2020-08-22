@@ -327,23 +327,27 @@ int main() {
           }
 
           /* calculate how to break up spline points */
+          /* Horizontal x axis */
           double target_x = 30;
+          /* The vertical y value of corresponding x value */
           double target_y = s(target_x);
+          /* Value of the hypoteneuse */
           double target_dist = sqrt((target_x * target_x) + (target_y * target_y));
-
           double x_add_on = 0;
 
-          ///Here we are dealing with two different types of points : one is the widely spaced 
-          ///spline points points_x and points_y, which are first five anchor points and not previous path points.
-          ///The other one(next_x_vals) is the previous path points 
-
+          /* Here we are dealing with two different types of points : one is the widely spaced 
+          spline points points_x and points_y, which are first five anchor points and not previous path points.
+          The other one(next_x_vals) is the previous path points which is filled in the spline after filling the 
+          five anchor points */         
           for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
               /* Dividing by 2.24 since it has to m/sec */
               double N = (target_dist / (0.02 * ref_vel / 2.24));
               /* Adding on the number of hash marks on x-axis starting with 0 */
               double x_point = x_add_on + (target_x) / N;
+              /* The s.setpoints(ptx, pty) of five anchor points helps in calculating y value corresponding to x value */
               double y_point = s(x_point);
 
+              /* Keep adding the spline points */
               x_add_on = x_point;
 
               double x_ref = x_point;
