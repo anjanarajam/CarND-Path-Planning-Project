@@ -15,11 +15,12 @@ using nlohmann::json;
 using std::string;
 using std::vector;
 
+//Static constant expressions added by me 
 static constexpr int LEFT_LANE{ 0 };
 static constexpr int MIDDLE_LANE{ 1 };
 static constexpr int RIGHT_LANE{ 2 };
 static constexpr int NO_LANE{ -1 };
-static constexpr double MAX_ACC{ 0.224f };
+static constexpr double CONSTANT_VEL_VAL{ 0.224f };
 static constexpr double MAX_VEL{ 49.5f };
 
 
@@ -70,9 +71,7 @@ int main() {
   /* Start in lane 1 which is the middle lane; left lane is 0 */
   int lane = MIDDLE_LANE;
 
-  /* Set some reference velocity in MPH - taken 49.5 since we dont want to
-  cross 50 MPH */
-  //double ref_vel = 49.5;
+  /* Set some reference velocity in MPH - taken as 0, maximum being 49.5 */
   double ref_vel = 0.0;
 
   h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
@@ -125,8 +124,6 @@ int main() {
               car_s = end_path_s;
           }
 
-          /* Set the flag */
-          bool too_close = false;
           /* Variable to define car lane */
           int car_lane;
           /* Variable to define direction of lanes */
@@ -135,7 +132,7 @@ int main() {
           int car_right = false ;
 
           /* Prediction - Get all the sensor fusion value of all the cars to know if there is any vehicle 
-          in any lane or the velocities of the other vehicles */
+          in the ego car's lane and the velocities of the other vehicles */
           for (int i = 0; i < sensor_fusion.size(); i++) {
               /* d value gives what lane other cars are in */
               float d = sensor_fusion[i][6];
@@ -152,13 +149,13 @@ int main() {
                   are nearby */
                   double check_car_s = sensor_fusion[i][5];
 
-                  /* What does the car look like in the future. For this we
-                   will use the speed of the car and the previous path size.
-                   previous path point projects the current path prev_size = number of previous waypoints
-                   .02 seconds = 20 milliseconds = time taken to reach the next waypoint
-                   check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
-                   prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
-                   therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
+                  /* What does the car look like in the future. For this we will use the speed of the car and the 
+                  previous path size.
+                   1) previous path point projects the current path prev_size = number of previous waypoints.
+                   2) .02 seconds = 20 milliseconds = time taken to reach the next waypoint
+                   3) check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
+                   4) prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
+                   5) therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
                   check_car_s += ((double)prev_size * .02 * check_speed);
 
                   /* Check in which lane the cars are present */
@@ -173,41 +170,50 @@ int main() {
                   }
 
                   /* If the car is in front of us and the the gap between the other car
-                  and our car is 30 meters, then we need to take action */
+                  and our car is less than 30 meters, set the flag */
                   if ((car_lane == lane) && (check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
                       car_ahead = true;
+                  /* If the car is in the left side and the the gap between the other car
+                  and our car is less than 30 meters, set the flag */
                   } else if ((car_lane == (lane - 1)) && (car_s - 30 > check_car_s < car_s + 30)) {
                       car_left = true;
+                  /* If the car is in the right side and the the gap between the other car
+                  and our car is less than 30 meters, set the flag */
                   } else if ((car_lane == (lane + 1)) && (car_s - 30 > check_car_s < car_s + 30)) {
                       car_right = true;
                   }
               }
           }
-
+          
+          /* Behavioral planning : what has to be done based on the predictions */
+          /* If a car is in front of us */
           if (car_ahead) {
+              /* And if there is no car in the left side of the lane */
               if (car_lane > LEFT_LANE && !car_left) {
                   lane--;
               }
+              /* And if there is no car in the right side of the lane */
               else if (car_lane < RIGHT_LANE && !car_right) {
                   lane++;
               }
-              /* To do an incremental change in the velocity, instead of saying lets go down to 29.5 m/sec,
-              check if the car is too close. lets say we want to go at a partucular acceleration, say 5m/sec2,
-              if the car is too close, subtract some constant value, 0.224(it ends up being 5 m/second2)*/
+              /* To do an incremental change in the velocity, if the car is too close, subtract some 
+              constant value, 0.224(it ends up being 5 m/second2)*/
               else {
-                  ref_vel -= MAX_ACC;
+                  ref_vel -= CONSTANT_VEL_VAL;
               }
           } else {
               if (car_lane != lane) {
-                  if ((car_lane == LEFT_LANE && !car_right) || (lane == 2 && !car_left)) {
+                  if ((car_lane == LEFT_LANE && !car_right) || (lane == RIGHT_LANE && !car_left)) {
                       lane = MIDDLE_LANE;
                   }
               }
 
+              /* To do an incremental change in the velocity, add some constant value, 0.224(it ends up being 5 m/second2)
+              if there are no cars closeby ego vehicle */
               if (ref_vel < MAX_VEL) {
-                  ref_vel += MAX_ACC;
+                  ref_vel += CONSTANT_VEL_VAL;
               }              
-          }      
+          }   
 
 #if 0
           /**
