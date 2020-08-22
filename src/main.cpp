@@ -19,8 +19,8 @@ static constexpr int LEFT_LANE{ 0 };
 static constexpr int MIDDLE_LANE{ 1 };
 static constexpr int RIGHT_LANE{ 2 };
 static constexpr int NO_LANE{ -1 };
-static constexpr int MAX_ACC{ 0.224f };
-static constexpr int MAX_VEL{ 49.5f };
+static constexpr double MAX_ACC{ 0.224f };
+static constexpr double MAX_VEL{ 49.5f };
 
 
 int main() {
