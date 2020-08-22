@@ -15,25 +15,38 @@ using nlohmann::json;
 using std::string;
 using std::vector;
 
+static constexpr int LEFT_LANE{ 0 };
+static constexpr int MIDDLE_LANE{ 1 };
+static constexpr int RIGHT_LANE{ 2 };
+static constexpr int NO_LANE{ -1 };
+static constexpr int MAX_ACC{ 0.224 };
+static constexpr int MAX_VEL{ 49.5 };
+
+
 int main() {
   uWS::Hub h;
 
-  // Load up map values for waypoint's x,y,s and d normalized normal vectors
+  /* Load up map values for waypoint's x,y,s and d normalized normal vectors 
+   way points are the points on the map. we can find the closest waypoint 
+   closest waypoint could be behind the car but next waypoint could be where to go next */
   vector<double> map_waypoints_x;
   vector<double> map_waypoints_y;
   vector<double> map_waypoints_s;
   vector<double> map_waypoints_dx;
   vector<double> map_waypoints_dy;
 
-  // Waypoint map to read from
+  /* Waypoint map to read from. Has 180 way points along the center of the track */
   string map_file_ = "../data/highway_map.csv";
-  // The max s value before wrapping around the track back to 0 -
-  // max length of the track
+  /* The max s value before wrapping around the track back to 0 -
+  max length of the track */
   double max_s = 6945.554;
 
+  /* Read the map file */
   std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
 
-  string line;
+  std::string line;
+  /* Get the x, y, s, d_x, d_y values of all the waypoints and 
+  add it to the vector */
   while (getline(in_map_, line)) {
     std::istringstream iss(line);
     double x;
@@ -55,11 +68,12 @@ int main() {
   }
 
   /* Start in lane 1 which is the middle lane; left lane is 0 */
-  int lane = 1;
+  int lane = MIDDLE_LANE;
 
   /* Set some reference velocity in MPH - taken 49.5 since we dont want to
   cross 50 MPH */
-  double ref_vel = 49.5;
+  //double ref_vel = 49.5;
+  double ref_vel = 0.0;
 
   h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
                &map_waypoints_dx,&map_waypoints_dy, &lane]
@@ -80,7 +94,7 @@ int main() {
         if (event == "telemetry") {
           // j[1] is the data JSON object
           
-          // Main car's localization Data - these values come from the simulator
+          /* Main car's localization Data - these values come from the simulator */
           double car_x = j[1]["x"];
           double car_y = j[1]["y"];
           double car_s = j[1]["s"];
@@ -88,53 +102,140 @@ int main() {
           double car_yaw = j[1]["yaw"];
           double car_speed = j[1]["speed"];
 
-          // Previous path data given to the Planner
+          /* Previous path data given to the Planner */
           auto previous_path_x = j[1]["previous_path_x"];
           auto previous_path_y = j[1]["previous_path_y"];
-          // Previous path's end s and d values 
+
+          /* Previous path's end s and d values */        
           double end_path_s = j[1]["end_path_s"];
           double end_path_d = j[1]["end_path_d"];
 
-          // Sensor Fusion Data, a list of all other cars on the same side 
-          //   of the road.
+          /* Sensor Fusion Data, a list of all other cars on the same side 
+          of the road */
           auto sensor_fusion = j[1]["sensor_fusion"];
 
           // My Code starts here  
-
-          //way points are the points on the map. we can find the closest waypoint 
-          //closest waypoint could be behind the car but next waypoint could be where to go next
-          /* Actual path planner points */
-
           /* Get the size of the previous path vector. The simulator
           actually gives the previous path */
           int prev_size = previous_path_x.size();
+         
+          /* If there are previous points , then the car_s will be previous end point.
+          This is beacuse the starting point will be the previous path's end-point */
+          if (prev_size > 0) {
+              car_s = end_path_s;
+          }
 
-          ///**
-          // * TODO: define a path made up of (x,y) points that the car will visit
-          // *   sequentially every .02 seconds
-          // */
-          ///* If car has to visit a points every 0.02 seconds then in 1 second there
-          //should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
-          //then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
-          //double dist_inc = 0.4;
-          //for (int i = 0; i < 50; ++i) {
-          //    /* To stay in the lanes Frenet co-ordinates are very useful */
-          //    /* We get the next iteration, otherwise our first point will be exactly where
-          //    car is at and we would not be transitioning */
-          //    double next_s = car_s + (i + 1) * dist_inc;
-          //    /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
-          //    since we are in the middle of the middle lane, so we are 6m from the double yellow
-          //    lane from the side of left lane*/
-          //    /* In other words we are 1 and a half lanes from the way points */
-          //    double next_d = 6;
+          /* Set the flag */
+          bool too_close = false;
+          /* Variable to define car lane */
+          int car_lane;
+          /* Variable to define direction of lanes */
+          int car_ahead = false;
+          int car_left = false;
+          int car_right = false ;
 
-          //    /* Now lets transform s and d values to x and y cordinates */
-          //    std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          /* Prediction - Get all the sensor fusion value of all the cars to know if there is any vehicle 
+          in any lane or the velocities of the other vehicles */
+          for (int i = 0; i < sensor_fusion.size(); i++) {
+              /* d value gives what lane other cars are in */
+              float d = sensor_fusion[i][6];
+              
+              /* Check if the other car is in our lane(between +2 and -2 from the center point 
+              of our middle lane ) and check how close it is to us */
+              if (d < (2 + 4 * lane + 2) && d > (2 + 4 * lane - 2)) {
+                  double vx = sensor_fusion[i][3];
+                  double vy = sensor_fusion[i][4];
+                  /* Speed is important to predict where the car would be 
+                  in future */
+                  double check_speed = sqrt(vx * vx + vy * vy);
+                  /* checks the s value of the other cars to check if they
+                  are nearby */
+                  double check_car_s = sensor_fusion[i][5];
 
-          //    next_x_vals.push_back(xy[0]);
-          //    next_y_vals.push_back(xy[1]);
-          //}
-#if 1
+                  /* What does the car look like in the future. For this we
+                   will use the speed of the car and the previous path size.
+                   previous path point projects the current path prev_size = number of previous waypoints
+                   .02 seconds = 20 milliseconds = time taken to reach the next waypoint
+                   check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
+                   prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
+                   therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
+                  check_car_s += ((double)prev_size * .02 * check_speed);
+
+                  /* Check in which lane the cars are present */
+                  if (d > 0 && d < 4) {
+                      car_lane = LEFT_LANE;
+                  } else if (d > 4 && d < 8) {
+                      car_lane = MIDDLE_LANE;
+                  } else if (d > 8 && d < 12) {
+                      car_lane = RIGHT_LANE;
+                  } else {
+                      car_lane = NO_LANE;
+                  }
+
+                  /* If the car is in front of us and the the gap between the other car
+                  and our car is 30 meters, then we need to take action */
+                  if ((car_lane == lane) && (check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
+                      car_ahead = true;
+                  } else if ((car_lane == (lane - 1)) && (car_s - 30 > check_car_s < car_s + 30)) {
+                      car_left = true;
+                  } else if ((car_lane == (lane + 1)) && (car_s - 30 > check_car_s < car_s + 30)) {
+                      car_right = true;
+                  }
+              }
+          }
+
+          if (car_ahead) {
+              if (car_lane > LEFT_LANE && !car_left) {
+                  lane--;
+              }
+              else if (car_lane < RIGHT_LANE && !car_right) {
+                  lane++;
+              }
+              /* To do an incremental change in the velocity, instead of saying lets go down to 29.5 m/sec,
+              check if the car is too close. lets say we want to go at a partucular acceleration, say 5m/sec2,
+              if the car is too close, subtract some constant value, 0.224(it ends up being 5 m/second2)*/
+              else {
+                  ref_vel -= MAX_ACC;
+              }
+          } else {
+              if (car_lane != lane) {
+                  if ((car_lane == LEFT_LANE && !car_right) || (lane == 2 && !car_left)) {
+                      lane = MIDDLE_LANE;
+                  }
+              }
+
+              if (ref_vel < MAX_VEL) {
+                  ref_vel += MAX_ACC;
+              }              
+          }      
+
+#if 0
+          /**
+           * TODO: define a path made up of (x,y) points that the car will visit
+           *   sequentially every .02 seconds
+           */
+          /* If car has to visit a points every 0.02 seconds then in 1 second there
+          should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
+          then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
+          double dist_inc = 0.4;
+          for (int i = 0; i < 50; ++i) {
+              /* To stay in the lanes Frenet co-ordinates are very useful */
+              /* We get the next iteration, otherwise our first point will be exactly where
+              car is at and we would not be transitioning */
+              double next_s = car_s + (i + 1) * dist_inc;
+              /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
+              since we are in the middle of the middle lane, so we are 6m from the double yellow
+              lane from the side of left lane*/
+              /* In other words we are 1 and a half lanes from the way points */
+              double next_d = 6;
+
+              /* Now lets transform s and d values to x and y cordinates */
+              std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+
+              next_x_vals.push_back(xy[0]);
+              next_y_vals.push_back(xy[1]);
+          }
+#endif
           /* Create a widely spaced vector points spaced at 30m each, later we will
           interpolate these points with spline and fill in more points */
           std::vector<double> points_x{};
@@ -222,7 +323,7 @@ int main() {
           /* calculate how to break up spline points */
           double target_x = 30;
           double target_y = s(target_x);
-          double target_dist = sqrt(target_x * target_x + target_y * target_y);
+          double target_dist = sqrt((target_x * target_x) + (target_y * target_y));
 
           double x_add_on = 0;
 
@@ -230,7 +331,7 @@ int main() {
           ///spline points points_x and points_y, which are first five anchor points and not previous path points.
           ///The other one(next_x_vals) is the previous path points 
 
-          for (int i = 0; i < (50 - previous_path_x.size()); i++) {
+          for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
               /* Dividing by 2.24 since it has to m/sec */
               double N = (target_dist / (0.02 * ref_vel / 2.24));
               /* Adding on the number of hash marks on x-axis starting with 0 */
@@ -252,7 +353,6 @@ int main() {
               next_x_vals.push_back(x_point);
               next_y_vals.push_back(y_point);
           }
-#endif
 
           json msgJson; 
 
