@@ -340,6 +340,13 @@ int main() {
           The other one(next_x_vals) is the previous path points which is filled in the spline after filling the 
           five anchor points */         
           for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
+              ref_vel += CONSTANT_VEL_VAL;
+
+              if (ref_vel > MAX_VEL) {
+                  ref_vel = MAX_VEL;
+              } else if (ref_vel < CONSTANT_VEL_VAL) {
+                  ref_vel = CONSTANT_VEL_VAL;
+              }
               /* Dividing by 2.24 since it has to m/sec */
               double N = (target_dist / (0.02 * ref_vel / 2.24));
               /* Adding on the number of hash marks on x-axis starting with 0 */
