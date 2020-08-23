@@ -340,7 +340,7 @@ int main() {
           The other one(next_x_vals) is the previous path points which is filled in the spline after filling the 
           five anchor points */         
           for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
-              ref_vel += CONSTANT_VEL_VAL;
+              ref_vel += ref_vel;
 
               if (ref_vel > MAX_VEL) {
                   ref_vel = MAX_VEL;
