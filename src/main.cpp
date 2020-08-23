@@ -126,6 +126,8 @@ int main() {
 
           /* Variable to define car lane */
           int car_lane;
+          /* Variable to define change in speed */
+          double speed_change;
           /* Variable to define direction of lanes */
           int car_ahead = false;
           int car_left = false;
@@ -199,7 +201,7 @@ int main() {
               /* To do an incremental change in the velocity, if the car is too close, subtract some 
               constant value, 0.224(it ends up being 5 m/second2)*/
               else {
-                  ref_vel -= CONSTANT_VEL_VAL;
+                  speed_change -= CONSTANT_VEL_VAL;
               }
           } else {
               if (car_lane != lane) {
@@ -211,7 +213,7 @@ int main() {
               /* To do an incremental change in the velocity, add some constant value, 0.224(it ends up being 5 m/second2)
               if there are no cars closeby ego vehicle */
               if (ref_vel < MAX_VEL) {
-                  ref_vel += CONSTANT_VEL_VAL;
+                  speed_change += CONSTANT_VEL_VAL;
               }              
           }   
 
@@ -340,7 +342,7 @@ int main() {
           The other one(next_x_vals) is the previous path points which is filled in the spline after filling the 
           five anchor points */         
           for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
-              ref_vel += ref_vel;
+              ref_vel += speed_change;
 
               if (ref_vel > MAX_VEL) {
                   ref_vel = MAX_VEL;
