@@ -255,7 +255,6 @@ int main() {
           double ref_y = car_y;
           double ref_yaw = deg2rad(car_yaw);
 
-
           /* Check whether the previous car state is nearly empty or has some points */
           if (prev_size < 2) {
               double previous_car_x = car_x - cos(car_yaw);
@@ -366,8 +365,8 @@ int main() {
               x_point = (x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw));
               y_point = (x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw));
 
-              x_point += x_ref;
-              y_point += y_ref;
+              x_point += ref_x;
+              y_point += ref_y;
 
               next_x_vals.push_back(x_point);
               next_y_vals.push_back(y_point);
