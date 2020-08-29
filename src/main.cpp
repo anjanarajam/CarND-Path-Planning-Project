@@ -208,7 +208,7 @@ int main() {
 
 
           } else {
-              if (ego_lane != ego_lane) {
+              if (ego_lane != MIDDLE_LANE) {
                   if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
                       ego_lane = MIDDLE_LANE;
                   }
