@@ -214,11 +214,9 @@ int main() {
               /* And if there is no car in the right side of the lane */
               else if (car_lane < RIGHT_LANE && !car_right) {
                   lane++;
-              } 
-
               /* To do an incremental change in the velocity, add some constant value, 0.224(it ends up being 5 m/second2)
               if there are no cars closeby ego vehicle */
-              if (ref_vel < MAX_VEL) {
+              } else if (ref_vel < MAX_VEL) {
                   speed_change += CONSTANT_VEL_VAL;
               }                      
           } else {
