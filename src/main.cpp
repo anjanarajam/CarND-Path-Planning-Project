@@ -174,15 +174,15 @@ int main() {
 
                   /* If the car is in front of us and the the gap between the other car
                   and our car is less than 30 meters, set the flag */
-                  if ((car_lane == lane) && (check_car_s > car_s)) {
+                  if ((car_lane == lane) && (check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
                         car_ahead = true;
 
-                        if ((check_car_s - car_s) < 30) {
-                            car_close = true;
-                        }
-                        else {
-                            car_close = false;
-                        }
+                        //if ((check_car_s - car_s) < 30) {
+                        //    car_close = true;
+                        //}
+                        //else {
+                        //    car_close = false;
+                        //}
                   /* If the car is in the left side and the the gap between the other car
                   and our car is less than 30 meters, set the flag */
                   } else if ((car_lane == (lane - 1)) && (car_s - 30 > check_car_s < car_s + 30)) {
@@ -202,11 +202,11 @@ int main() {
                   speed_change += CONSTANT_VEL_VAL;
               } 
 
-              if (car_close) {
-                  /* To do an incremental change in the velocity, if the car is too close, subtract some
-                  constant value, 0.224(it ends up being 5 m/second2)*/
-                  speed_change -= CONSTANT_VEL_VAL;
-              }
+
+                  ///* To do an incremental change in the velocity, if the car is too close, subtract some
+                  //constant value, 0.224(it ends up being 5 m/second2)*/
+                  //speed_change -= CONSTANT_VEL_VAL;
+              
 
               /* And if there is no car in the left side of the lane */
               if (car_lane > LEFT_LANE && !car_left) {
