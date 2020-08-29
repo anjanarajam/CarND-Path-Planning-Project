@@ -132,6 +132,7 @@ int main() {
           int car_ahead = false;
           int car_left = false;
           int car_right = false ;
+          int car_close = false;
 
           /* Prediction - Get all the sensor fusion value of all the cars to know if there is any vehicle 
           in the ego car's lane and the velocities of the other vehicles */
@@ -173,8 +174,12 @@ int main() {
 
                   /* If the car is in front of us and the the gap between the other car
                   and our car is less than 30 meters, set the flag */
-                  if ((car_lane == lane) && (check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
-                      car_ahead = true;
+                  if (car_lane == lane) {
+                        car_ahead = true;
+
+                        if ((check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
+                            car_close = true;
+                        }                     
                   /* If the car is in the left side and the the gap between the other car
                   and our car is less than 30 meters, set the flag */
                   } else if ((car_lane == (lane - 1)) && (car_s - 30 > check_car_s < car_s + 30)) {
@@ -189,10 +194,19 @@ int main() {
           
           /* Behavioral planning : what has to be done based on the predictions */
           /* If a car is in front of us */
-          if (car_ahead) {
-              /* To do an incremental change in the velocity, if the car is too close, subtract some
-              constant value, 0.224(it ends up being 5 m/second2)*/
-              speed_change -= CONSTANT_VEL_VAL; 
+          if (car_ahead) { 
+              if (car_close) {
+                  /* To do an incremental change in the velocity, if the car is too close, subtract some
+                  constant value, 0.224(it ends up being 5 m/second2)*/
+                  speed_change -= CONSTANT_VEL_VAL;
+              }
+              else {
+                  /* To do an incremental change in the velocity, add some constant value, 0.224(it ends up being 5 m/second2)
+                  if there are no cars closeby ego vehicle */
+                  if (ref_vel < MAX_VEL) {
+                      speed_change += CONSTANT_VEL_VAL;
+                  }
+              }
 
               /* And if there is no car in the left side of the lane */
               if (car_lane > LEFT_LANE && !car_left) {
@@ -207,15 +221,8 @@ int main() {
                   if ((car_lane == LEFT_LANE && !car_right) || (lane == RIGHT_LANE && !car_left)) {
                       lane = MIDDLE_LANE;
                   }
-              }
-
-              /* To do an incremental change in the velocity, add some constant value, 0.224(it ends up being 5 m/second2)
-              if there are no cars closeby ego vehicle */
-              if (ref_vel < MAX_VEL) {
-                  speed_change += CONSTANT_VEL_VAL;
               }              
           }   
-
 #if 0
           /**
            * TODO: define a path made up of (x,y) points that the car will visit
