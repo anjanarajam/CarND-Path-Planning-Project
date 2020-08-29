@@ -198,6 +198,10 @@ int main() {
           /* Behavioral planning : what has to be done based on the predictions */
           /* If a car is in front of us */
           if (car_ahead) {
+              do {
+                  speed_change += CONSTANT_VEL_VAL;
+              } while (ref_vel < MAX_VEL);
+
               if (car_close) {
                   /* To do an incremental change in the velocity, if the car is too close, subtract some
                   constant value, 0.224(it ends up being 5 m/second2)*/
