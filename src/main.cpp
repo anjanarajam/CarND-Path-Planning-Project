@@ -198,15 +198,14 @@ int main() {
           /* Behavioral planning : what has to be done based on the predictions */
           /* If a car is in front of us */
           if (car_ahead) {
+
+              /* To do an incremental change in the velocity, if the car is too close, subtract some
+              constant value, 0.224(it ends up being 5 m/second2)*/
+              speed_change -= CONSTANT_VEL_VAL;
+
               if (ref_vel < MAX_VEL) {
                   speed_change += CONSTANT_VEL_VAL;
-              } 
-
-
-            /* To do an incremental change in the velocity, if the car is too close, subtract some
-            constant value, 0.224(it ends up being 5 m/second2)*/
-            speed_change -= CONSTANT_VEL_VAL;
-              
+              }               
 
               /* And if there is no car in the left side of the lane */
               if (car_lane > LEFT_LANE && !car_left) {
