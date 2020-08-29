@@ -280,11 +280,11 @@ int main() {
               points_y.push_back(ref_y);
           }
 
-          std::vector<double> next_wp0 = getXY(car_s + 30, (2 + 4 * lane), map_waypoints_s,
+          std::vector<double> next_wp0 = getXY(car_s + 30, (2 + 4 * ego_lane), map_waypoints_s,
               map_waypoints_x, map_waypoints_y);
-          std::vector<double> next_wp1 = getXY(car_s + 60, (2 + 4 * lane), map_waypoints_s,
+          std::vector<double> next_wp1 = getXY(car_s + 60, (2 + 4 * ego_lane), map_waypoints_s,
               map_waypoints_x, map_waypoints_y);
-          std::vector<double> next_wp2 = getXY(car_s + 90, (2 + 4 * lane), map_waypoints_s,
+          std::vector<double> next_wp2 = getXY(car_s + 90, (2 + 4 * ego_lane), map_waypoints_s,
               map_waypoints_x, map_waypoints_y);
 
           points_x.push_back(next_wp0[0]);
@@ -336,7 +336,7 @@ int main() {
           The other one(next_x_vals) is the previous path points which is filled in the spline after filling the 
           five anchor points */         
           for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
-              ref_vel += speed_change;
+              ref_vel += ego_speed_change;
 
               if (ref_vel > MAX_VEL) {
                   ref_vel = MAX_VEL;
