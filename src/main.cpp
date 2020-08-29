@@ -203,9 +203,9 @@ int main() {
               } 
 
 
-                  ///* To do an incremental change in the velocity, if the car is too close, subtract some
-                  //constant value, 0.224(it ends up being 5 m/second2)*/
-                  //speed_change -= CONSTANT_VEL_VAL;
+            /* To do an incremental change in the velocity, if the car is too close, subtract some
+            constant value, 0.224(it ends up being 5 m/second2)*/
+            speed_change -= CONSTANT_VEL_VAL;
               
 
               /* And if there is no car in the left side of the lane */
