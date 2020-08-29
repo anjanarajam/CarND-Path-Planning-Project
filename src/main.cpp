@@ -202,10 +202,10 @@ int main() {
               /* To do an incremental change in the velocity, if the car is too close, subtract some
               constant value, 0.224(it ends up being 5 m/second2)*/
               speed_change -= CONSTANT_VEL_VAL;
-
+/*
               if (ref_vel < MAX_VEL) {
                   speed_change += CONSTANT_VEL_VAL;
-              }               
+              }   */            
 
               /* And if there is no car in the left side of the lane */
               if (car_lane > LEFT_LANE && !car_left) {
@@ -219,9 +219,9 @@ int main() {
 
               /* To do an incremental change in the velocity, add some constant value, 0.224(it ends up being 5 m/second2)
               if there are no cars closeby ego vehicle */
-/*              } else if (ref_vel < MAX_VEL) {
+              } else if (ref_vel < MAX_VEL) {
                     speed_change += CONSTANT_VEL_VAL;
-              */
+              
                        
           } else {
               if (car_lane != lane) {
