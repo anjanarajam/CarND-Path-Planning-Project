@@ -206,14 +206,16 @@ int main() {
               if there are no cars closeby ego vehicle */
               } 
 
-              if (ref_vel < MAX_VEL)
-                  ego_speed_change -= CONSTANT_VEL_VAL;
+
           } else {
               if (ego_lane != ego_lane) {
                   if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
                       ego_lane = MIDDLE_LANE;
                   }
-              }              
+              }
+
+              if (ref_vel < MAX_VEL)
+                  ego_speed_change -= CONSTANT_VEL_VAL;
           }   
 #if 0
           /**
