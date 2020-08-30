@@ -138,21 +138,21 @@ int main() {
           in the ego car's lane and the velocities of the other vehicles */
           for (int i = 0; i < sensor_fusion.size(); i++) {
               /* d value gives what lane other cars are in */
-              float d_target  = sensor_fusion[i][6];
-              
-              ///* Check if the other car is in our lane(between +2 and -2 from the center point 
-              //of our middle lane ) and check how close it is to us */
-              //if (d_target < (2 + 4 * ego_lane + 2) && d_target > (2 + 4 * ego_lane - 2)) {
+              float d_target = sensor_fusion[i][6];
+
+              /* Check if the other car is in our lane(between +2 and -2 from the center point
+              of our middle lane ) and check how close it is to us */
+              if (d_target < (2 + 4 * ego_lane + 2) && d_target >(2 + 4 * ego_lane - 2)) {
                   double vx_target = sensor_fusion[i][3];
                   double vy_target = sensor_fusion[i][4];
-                  /* Speed is important to predict where the car would be 
+                  /* Speed is important to predict where the car would be
                   in future */
                   double check_target_speed = sqrt(vx_target * vx_target + vy_target * vy_target);
                   /* checks the s value of the other cars to check if they
                   are nearby */
                   double check_target_s = sensor_fusion[i][5];
 
-                  /* What does the car look like in the future. For this we will use the speed of the car and the 
+                  /* What does the car look like in the future. For this we will use the speed of the car and the
                   previous path size.
                    1) previous path point projects the current path of the simulator; prev_size = number of previous waypoints.
                    2) .02 seconds = 20 milliseconds = time taken to reach the next waypoint
@@ -164,11 +164,14 @@ int main() {
                   /* Check in which lane the cars are present */
                   if (d_target > 0 && d_target < 4) {
                       targer_car_lane = LEFT_LANE;
-                  } else if (d_target > 4 && d_target < 8) {
+                  }
+                  else if (d_target > 4 && d_target < 8) {
                       targer_car_lane = MIDDLE_LANE;
-                  } else if (d_target > 8 && d_target < 12) {
+                  }
+                  else if (d_target > 8 && d_target < 12) {
                       targer_car_lane = RIGHT_LANE;
-                  } else {
+                  }
+                  else {
                       targer_car_lane = NO_LANE;
                   }
 
@@ -176,17 +179,19 @@ int main() {
                   and our car is less than 30 meters, set the flag */
                   if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                       target_car_ahead = true;
-                  /* If the car is in the left side and the the gap between the other car
-                  and our car is less than 30 meters, set the flag */
-                  } else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+                      /* If the car is in the left side and the the gap between the other car
+                      and our car is less than 30 meters, set the flag */
+                  }
+                  else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                       target_car_left = true;
-                  /* If the car is in the right side and the the gap between the other car
-                  and our car is less than 30 meters, set the flag */
-                  } else if ((targer_car_lane == (ego_lane + 1)) && (car_s > check_target_s < car_s + 30)) {
+                      /* If the car is in the right side and the the gap between the other car
+                      and our car is less than 30 meters, set the flag */
+                  }
+                  else if ((targer_car_lane == (ego_lane + 1)) && (car_s > check_target_s < car_s + 30)) {
                       target_car_right = true;
                   }
               }
-          
+          }
           
           /* Behavioral planning : what has to be done based on the predictions */
           /* If a car is in front of us */
