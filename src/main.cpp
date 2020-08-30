@@ -154,9 +154,9 @@ int main() {
                     targer_car_lane = NO_LANE;
                 }
 
-                ///* Check if the other car is in ou\r lane(between +2 and -2 from the center point
-                //of our middle lane ) and check how close it is to us */
-                //if (d_target < (2 + 4 * ego_lane + 2) && d_target >(2 + 4 * ego_lane - 2)) {
+                /* Check if the other car is in ou\r lane(between +2 and -2 from the center point
+                of our middle lane ) and check how close it is to us */
+                if (d_target < (2 + 4 * ego_lane + 2) && d_target >(2 + 4 * ego_lane - 2)) {
                     double vx_target = sensor_fusion[i][3];
                     double vy_target = sensor_fusion[i][4];
                     /* Speed is important to predict where the car would be
@@ -175,78 +175,56 @@ int main() {
                      5) therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
                     check_target_s += ((double)prev_size * .02 * check_target_speed);
 
-                    /* If the car is in front of us and the the gap between the other car
-                    and our car is less than 30 meters, set the flag */
-                    if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
-                        target_car_ahead = true;
-                        /* If the car is in the left side and the the gap between the other car
-                        and our car is less than 30 meters, set the flag */
+                    if ((check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
+                        ref_vel = 29.5;
                     }
-                    else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
-                        target_car_left = true;
-                        /* If the car is in the right side and the the gap between the other car
-                        and our car is less than 30 meters, set the flag */
-                    }
-                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
-                        target_car_right = true;
-                    }
-                //}
-            }
-          
-          
-          /* Behavioral planning : what has to be done based on the predictions */
-          /* If a car is in front of us */
-          if (target_car_ahead) {
-              /* And if there is no car in the left side of the lane */
-              if (ego_lane > LEFT_LANE && !target_car_left) {
-                  ego_lane--;
-              }
-              /* And if there is no car in the right side of the lane */
-              else if (ego_lane < RIGHT_LANE && !target_car_right) {
-                  ego_lane++;
-              }
-              else {
-                  /* To do an incremental change in the velocity, if the car is too close, subtract some
-                  constant value, 0.224(it ends up being 5 m/second2)*/
-                  ego_speed_change -= CONSTANT_VEL_VAL;
-              }
-          } else {
-              if (ego_lane != MIDDLE_LANE) {
-                  if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
-                      ego_lane = MIDDLE_LANE;
-                  }
-              }
 
-              if (ref_vel < MAX_VEL)
-                  ego_speed_change += CONSTANT_VEL_VAL;
-          }   
-#if 0
-          /**
-           * TODO: define a path made up of (x,y) points that the car will visit
-           *   sequentially every .02 seconds
-           */
-          /* If car has to visit a points every 0.02 seconds then in 1 second there
-          should be 50 points. And if we keep the distance between 2 points as 0.5 meter,
-          then the speed of the car becomes 0.5 * 50 = 25 m/second (50 MPH) */
-          double dist_inc = 0.4;
-          for (int i = 0; i < 50; ++i) {
-              /* To stay in the lanes Frenet co-ordinates are very useful */
-              /* We get the next iteration, otherwise our first point will be exactly where
-              car is at and we would not be transitioning */
-              double next_s = car_s + (i + 1) * dist_inc;
-              /* We are in the middle lane, which means 4m of left lane + 2m of middle lane 
-              since we are in the middle of the middle lane, so we are 6m from the double yellow
-              lane from the side of left lane*/
-              /* In other words we are 1 and a half lanes from the way points */
-              double next_d = 6;
+          //          /* If the car is in front of us and the the gap between the other car
+          //          and our car is less than 30 meters, set the flag */
+          //          if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
+          //              target_car_ahead = true;
+          //              /* If the car is in the left side and the the gap between the other car
+          //              and our car is less than 30 meters, set the flag */
+          //          }
+          //          else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+          //              target_car_left = true;
+          //              /* If the car is in the right side and the the gap between the other car
+          //              and our car is less than 30 meters, set the flag */
+          //          }
+          //          else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+          //              target_car_right = true;
+          //          }
+          //      }
+          //  }
+          //
+          //
+          ///* Behavioral planning : what has to be done based on the predictions */
+          ///* If a car is in front of us */
+          //if (target_car_ahead) {
+          //    /* And if there is no car in the left side of the lane */
+          //    if (ego_lane > LEFT_LANE && !target_car_left) {
+          //        ego_lane--;
+          //    }
+          //    /* And if there is no car in the right side of the lane */
+          //    else if (ego_lane < RIGHT_LANE && !target_car_right) {
+          //        ego_lane++;
+          //    }
+          //    else {
+          //        /* To do an incremental change in the velocity, if the car is too close, subtract some
+          //        constant value, 0.224(it ends up being 5 m/second2)*/
+          //        ego_speed_change -= CONSTANT_VEL_VAL;
+          //    }
+          //} else {
+          //    if (ego_lane != MIDDLE_LANE) {
+          //        if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
+          //            ego_lane = MIDDLE_LANE;
+          //        }
+          //    }
 
-              /* Now lets transform s and d values to x and y cordinates */
-              std::vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          //    if (ref_vel < MAX_VEL)
+          //        ego_speed_change += CONSTANT_VEL_VAL;
+          //}   
 
-              next_x_vals.push_back(xy[0]);
-              next_y_vals.push_back(xy[1]);
-          }
-#endif
           /* Create a widely spaced vector points spaced at 30m each, later we will
           interpolate these points with spline and fill in more points */
           std::vector<double> points_x{};
@@ -344,13 +322,13 @@ int main() {
           The other one(next_x_vals) is the previous path points which is filled in the spline after filling the 
           five anchor points */         
           for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
-              ref_vel += ego_speed_change;
+              //ref_vel += ego_speed_change;
 
-              if (ref_vel > MAX_VEL) {
-                  ref_vel = MAX_VEL;
-              } else if (ref_vel < CONSTANT_VEL_VAL) {
-                  ref_vel = CONSTANT_VEL_VAL;
-              }
+              //if (ref_vel > MAX_VEL) {
+              //    ref_vel = MAX_VEL;
+              //} else if (ref_vel < CONSTANT_VEL_VAL) {
+              //    ref_vel = CONSTANT_VEL_VAL;
+              //}
               /* Dividing by 2.24 since it has to m/sec */
               double N = (target_dist / (0.02 * ref_vel / 2.24));
               /* Adding on the number of hash marks on x-axis starting with 0 */
