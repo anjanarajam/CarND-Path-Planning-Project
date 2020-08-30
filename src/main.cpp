@@ -140,9 +140,9 @@ int main() {
               /* d value gives what lane other cars are in */
               float d_target = sensor_fusion[i][6];
 
-              /* Check if the other car is in our lane(between +2 and -2 from the center point
-              of our middle lane ) and check how close it is to us */
-              if (d_target < (2 + 4 * ego_lane + 2) && d_target >(2 + 4 * ego_lane - 2)) {
+              ///* Check if the other car is in our lane(between +2 and -2 from the center point
+              //of our middle lane ) and check how close it is to us */
+              //if (d_target < (2 + 4 * ego_lane + 2) && d_target >(2 + 4 * ego_lane - 2)) {
                   double vx_target = sensor_fusion[i][3];
                   double vy_target = sensor_fusion[i][4];
                   /* Speed is important to predict where the car would be
@@ -191,7 +191,7 @@ int main() {
                       target_car_right = true;
                   }
               }
-          }
+          
           
           /* Behavioral planning : what has to be done based on the predictions */
           /* If a car is in front of us */
