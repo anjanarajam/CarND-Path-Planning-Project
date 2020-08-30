@@ -154,7 +154,7 @@ int main() {
 
                   /* What does the car look like in the future. For this we will use the speed of the car and the 
                   previous path size.
-                   1) previous path point projects the current path prev_size = number of previous waypoints.
+                   1) previous path point projects the current path of the simulator; prev_size = number of previous waypoints.
                    2) .02 seconds = 20 milliseconds = time taken to reach the next waypoint
                    3) check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
                    4) prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
@@ -193,7 +193,7 @@ int main() {
           if (target_car_ahead) {
               /* To do an incremental change in the velocity, if the car is too close, subtract some
               constant value, 0.224(it ends up being 5 m/second2)*/
-              //ego_speed_change -= CONSTANT_VEL_VAL;
+              ego_speed_change -= CONSTANT_VEL_VAL;
 
               /* And if there is no car in the left side of the lane */
               if (ego_lane > LEFT_LANE && !target_car_left) {
@@ -203,11 +203,6 @@ int main() {
               else if (ego_lane < RIGHT_LANE && !target_car_right) {
                   ego_lane++;
               }
-              else {
-                  ego_speed_change -= CONSTANT_VEL_VAL;
-              }
-
-
           } else {
               if (ego_lane != MIDDLE_LANE) {
                   if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
@@ -216,7 +211,7 @@ int main() {
               }
 
               if (ref_vel < MAX_VEL)
-                  ego_speed_change -= CONSTANT_VEL_VAL;
+                  ego_speed_change += CONSTANT_VEL_VAL;
           }   
 #if 0
           /**
