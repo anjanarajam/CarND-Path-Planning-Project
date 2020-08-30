@@ -162,13 +162,13 @@ int main() {
                     check_target_s += ((double)prev_size * .02 * check_target_speed);
 
                     /* Check in which lane the cars are present */
-                    if (d_target > 0 && d_target <= 4) {
+                    if (d_target > 0 && d_target < 4) {
                         targer_car_lane = LEFT_LANE;
                     }
-                    else if (d_target > 4 && d_target <= 8) {
+                    else if (d_target > 4 && d_target < 8) {
                         targer_car_lane = MIDDLE_LANE;
                     }
-                    else if (d_target > 8 && d_target <= 12) {
+                    else if (d_target > 8 && d_target < 12) {
                         targer_car_lane = RIGHT_LANE;
                     }
                     else {
