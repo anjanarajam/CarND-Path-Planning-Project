@@ -187,7 +187,7 @@ int main() {
                       /* If the car is in the right side and the the gap between the other car
                       and our car is less than 30 meters, set the flag */
                   }
-                  else if ((targer_car_lane == (ego_lane + 1)) && (car_s > check_target_s < car_s + 30)) {
+                  else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                       target_car_right = true;
                   }
               }
