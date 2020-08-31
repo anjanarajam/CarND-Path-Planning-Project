@@ -220,8 +220,16 @@ int main() {
                 }
 
             }
-            else if (ref_vel < MAX_VEL) {
-                ref_vel += CONSTANT_VEL_VAL;
+            else {
+                if (ref_vel < MAX_VEL) {
+                    ref_vel += CONSTANT_VEL_VAL;
+                }
+
+                if (ego_lane != MIDDLE_LANE) {
+                    if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
+                        ego_lane = MIDDLE_LANE;
+                    }
+                }
             }
 
           //
