@@ -181,9 +181,9 @@ int main() {
                     }
 
                     if (target_car_ahead) {
-                        ego_speed_change -= CONSTANT_VEL_VAL;
+                        ref_vel -= CONSTANT_VEL_VAL;
                     } else {
-                        ego_speed_change += CONSTANT_VEL_VAL;
+                        ref_vel += CONSTANT_VEL_VAL;
                     }
 
 
