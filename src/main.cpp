@@ -177,7 +177,7 @@ int main() {
                     check_target_s += ((double)prev_size * .02 * check_target_speed);
 
                     if ((check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
-                        ref_vel = 29.5;
+                        //ref_vel = 29.5;
                     }
 
           //          /* If the car is in front of us and the the gap between the other car
