@@ -72,8 +72,8 @@ int main() {
   int ego_lane = MIDDLE_LANE;
 
   /* Set some reference velocity in MPH - taken as 0, maximum being 49.5 */
-  //double ref_vel = 0.0;
-  double ref_vel = MAX_VEL;
+  double ref_vel = 0.0;
+  //double ref_vel = MAX_VEL;
 
   h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
                &map_waypoints_dx,&map_waypoints_dy, &ego_lane]
@@ -130,10 +130,9 @@ int main() {
             /* Variable to define change in speed */
             double ego_speed_change;
             /* Variable to define direction of lanes */
-            int target_car_ahead = false;
-            int target_car_left = false;
-            int target_car_right = false;
-            int target_car_close = false;
+            bool target_car_ahead = false;
+            bool target_car_left = false;
+            bool target_car_right = false;
 
             ///* Prediction - Get all the sensor fusion value of all the cars to know if there is any vehicle
             //in the ego car's lane and the velocities of the other vehicles */
@@ -177,8 +176,17 @@ int main() {
                     check_target_s += ((double)prev_size * .02 * check_target_speed);
 
                     if ((check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
-                        ref_vel = 29.5;
+                        target_car_ahead = true;
+                        //ref_vel = 29.5;
                     }
+
+                    if (target_car_ahead) {
+                        ego_speed_change -= CONSTANT_VEL_VAL;
+                    } else {
+                        ego_speed_change += CONSTANT_VEL_VAL;
+                    }
+
+
 
           //          /* If the car is in front of us and the the gap between the other car
           //          and our car is less than 30 meters, set the flag */
