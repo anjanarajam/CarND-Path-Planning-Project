@@ -182,10 +182,24 @@ int main() {
                         //if (ego_lane > 0) {
                         //    ego_lane--;
                         //}
+
+
+                    } else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+                        target_car_left = true;
+                        /* If the car is in the right side and the the gap between the other car
+                        and our car is less than 30 meters, set the flag */
                     }
+/*                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+                        target_car_right = true;
+                    }    */                
 
                     if (target_car_ahead) {
                         ref_vel -= CONSTANT_VEL_VAL;
+
+                            /* And if there is no car in the left side of the lane */
+                            if (ego_lane > LEFT_LANE && !target_car_left) {
+                                ego_lane--;
+                            }
                     } else if (ref_vel < MAX_VEL) {
                         ref_vel += CONSTANT_VEL_VAL;
                     }
@@ -211,8 +225,8 @@ int main() {
             }
           //
           //
-          ///* Behavioral planning : what has to be done based on the predictions */
-          ///* If a car is in front of us */
+          /* Behavioral planning : what has to be done based on the predictions */
+          /* If a car is in front of us */
           //if (target_car_ahead) {
           //    /* And if there is no car in the left side of the lane */
           //    if (ego_lane > LEFT_LANE && !target_car_left) {
@@ -236,7 +250,7 @@ int main() {
 
           //    if (ref_vel < MAX_VEL)
           //        ego_speed_change += CONSTANT_VEL_VAL;
-          //}   
+             //}   
 
           /* Create a widely spaced vector points spaced at 30m each, later we will
           interpolate these points with spline and fill in more points */
