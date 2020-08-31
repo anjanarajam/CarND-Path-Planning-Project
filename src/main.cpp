@@ -72,7 +72,7 @@ int main() {
   int ego_lane = MIDDLE_LANE;
 
   /* Set some reference velocity in MPH - taken as 0, maximum being 49.5 */
-  double ref_vel = 0.0;
+  double ref_vel = 0.0f;
   //double ref_vel = MAX_VEL;
 
   h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
