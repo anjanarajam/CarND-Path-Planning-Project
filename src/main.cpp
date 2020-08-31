@@ -182,10 +182,10 @@ int main() {
                         //if (ego_lane > 0) {
                         //    ego_lane--;
                         //}
-                         /* And if there is no car in the left side of the lane */
-                        if (ego_lane > LEFT_LANE && !target_car_left) {
-                            ego_lane--;
-                        }
+                        // /* And if there is no car in the left side of the lane */
+                        //if (ego_lane > LEFT_LANE && !target_car_left) {
+                        //    ego_lane--;
+                        //}
                     } 
                     //else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                     //    target_car_left = true;
@@ -218,6 +218,11 @@ int main() {
 
             if (target_car_ahead) {
                 ref_vel -= CONSTANT_VEL_VAL;
+
+                /* And if there is no car in the left side of the lane */
+                if (ego_lane > LEFT_LANE && !target_car_left) {
+                    ego_lane--;
+                }
 
             }
             else if (ref_vel < MAX_VEL) {
