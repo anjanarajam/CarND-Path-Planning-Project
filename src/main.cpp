@@ -182,7 +182,7 @@ int main() {
 
                     if (target_car_ahead) {
                         ref_vel -= CONSTANT_VEL_VAL;
-                    } else {
+                    } else if (ref_vel < MAX_VEL) {
                         ref_vel += CONSTANT_VEL_VAL;
                     }
 
