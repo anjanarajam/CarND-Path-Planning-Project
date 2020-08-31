@@ -309,7 +309,7 @@ int main() {
               next_y_vals.push_back(previous_path_y[i]);
           }
 
-          /* calculate how to break up spline points */
+          /* calculate how to break up the 30m spaced spline points */
           /* Horizontal x axis */
           double target_x = 30;
           /* The vertical y value of corresponding x value */
@@ -330,26 +330,36 @@ int main() {
               //} else if (ref_vel < CONSTANT_VEL_VAL) {
               //    ref_vel = CONSTANT_VEL_VAL;
               //}
-              /* Dividing by 2.24 since it has to m/sec */
-              double N = (target_dist / (0.02 * ref_vel / 2.24));
-              /* Adding on the number of hash marks on x-axis starting with 0 */
-              double x_point = x_add_on + (target_x) / N;
+
+              /* Calculate distance between two points within target distance(hypotenuese) of 30m. Since it takes 20millisecond to
+              move from one point to another, the distance between two points is*/
+              /* Dividing by 2.24 since it has to m/sec; and 0.02 is 20milliseconds in seconds */
+              double target_dist_points = (0.02 * ref_vel / 2.24);
+              /* Now claculate how many points within target distance(hypotenuese) of 30m. */
+              double N = (target_dist / target_dist_points);
+              /* Now use these same N points to break x-axis or to calculate distance between two x points */
+              double dist_target_x_points = (target_x) / N;
+              /* Adding on the number of points on x-axis starting with 0 */
+              double x_point = x_add_on + dist_target_x_points;
               /* The s.setpoints(ptx, pty) of five anchor points helps in calculating y value corresponding to x value */
               double y_point = s(x_point);
 
-              /* Keep adding the spline points */
+              /* Keep adding x points to calculate the x point in the spline */
               x_add_on = x_point;
 
-              double x_ref = x_point;
-              double y_ref = y_point;
+              /* Transfer to a variable to convert it back to global co-ordinates */
+              double x_temp = x_point;
+              double y_temp = y_point;
 
               /* Transform back to global co-ordinates */
-              x_point = (x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw));
-              y_point = (x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw));
+              x_point = (x_temp * cos(ref_yaw) - y_temp * sin(ref_yaw));
+              y_point = (x_temp * sin(ref_yaw) + y_temp * cos(ref_yaw));
 
+              /* Add the calculated x-points to the initial x, y points of the car which we got from localization */
               x_point += ref_x;
               y_point += ref_y;
 
+              /* Push these final calculated x,y points to the path planner */
               next_x_vals.push_back(x_point);
               next_y_vals.push_back(y_point);
           }
