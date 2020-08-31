@@ -192,14 +192,14 @@ int main() {
             if (target_car_ahead) {
                 ref_vel -= CONSTANT_VEL_VAL;
 
-                ///* And if there is no car in the left side of the lane */
-                //if (ego_lane > LEFT_LANE && !target_car_left) {
-                //    ego_lane--;
-                //}
-                ///* And if there is no car in the right side of the lane */
-                //else if (ego_lane < RIGHT_LANE && !target_car_right) {
-                //    ego_lane++;
-                //}
+                /* And if there is no car in the left side of the lane */
+                if (ego_lane > LEFT_LANE && !target_car_left) {
+                    ego_lane--;
+                }
+                /* And if there is no car in the right side of the lane */
+                else if (ego_lane < RIGHT_LANE && !target_car_right) {
+                    ego_lane++;
+                }
 
             }
             else {
