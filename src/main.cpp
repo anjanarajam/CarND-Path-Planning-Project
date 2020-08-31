@@ -207,7 +207,7 @@ int main() {
           //          else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
           //              target_car_right = true;
           //          }
-                }
+               // }
             }
           //
           //
