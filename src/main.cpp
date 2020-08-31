@@ -183,28 +183,9 @@ int main() {
                         /* If the car is in the right side and the the gap between the other car
                         and our car is less than 30 meters, set the flag */
                     }
-/*                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                         target_car_right = true;
-                    }    */                
-
-
-
-          //          /* If the car is in front of us and the the gap between the other car
-          //          and our car is less than 30 meters, set the flag */
-          //          if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
-          //              target_car_ahead = true;
-          //              /* If the car is in the left side and the the gap between the other car
-          //              and our car is less than 30 meters, set the flag */
-          //          }
-          //          else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
-          //              target_car_left = true;
-          //              /* If the car is in the right side and the the gap between the other car
-          //              and our car is less than 30 meters, set the flag */
-          //          }
-          //          else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
-          //              target_car_right = true;
-          //          }
-               // }
+                    }
             }
 
             if (target_car_ahead) {
@@ -230,36 +211,7 @@ int main() {
                         ego_lane = MIDDLE_LANE;
                     }
                 }
-            }
-
-          //
-          //
-          /* Behavioral planning : what has to be done based on the predictions */
-          /* If a car is in front of us */
-          //if (target_car_ahead) {
-          //    /* And if there is no car in the left side of the lane */
-          //    if (ego_lane > LEFT_LANE && !target_car_left) {
-          //        ego_lane--;
-          //    }
-          //    /* And if there is no car in the right side of the lane */
-          //    else if (ego_lane < RIGHT_LANE && !target_car_right) {
-          //        ego_lane++;
-          //    }
-          //    else {
-          //        /* To do an incremental change in the velocity, if the car is too close, subtract some
-          //        constant value, 0.224(it ends up being 5 m/second2)*/
-          //        ego_speed_change -= CONSTANT_VEL_VAL;
-          //    }
-          //} else {
-          //    if (ego_lane != MIDDLE_LANE) {
-          //        if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
-          //            ego_lane = MIDDLE_LANE;
-          //        }
-          //    }
-
-          //    if (ref_vel < MAX_VEL)
-          //        ego_speed_change += CONSTANT_VEL_VAL;
-             //}   
+            } 
 
           /* Create a widely spaced vector points spaced at 30m each, later we will
           interpolate these points with spline and fill in more points */
