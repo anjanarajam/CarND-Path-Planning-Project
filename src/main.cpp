@@ -177,21 +177,12 @@ int main() {
 
                     if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                         target_car_ahead = true;
-                        //ref_vel = 29.5;
-                        //
-                        //if (ego_lane > 0) {
-                        //    ego_lane--;
-                        //}
-                        // /* And if there is no car in the left side of the lane */
-                        //if (ego_lane > LEFT_LANE && !target_car_left) {
-                        //    ego_lane--;
-                        //}
                     } 
-                    //else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
-                    //    target_car_left = true;
+                    else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+                        target_car_left = true;
                         /* If the car is in the right side and the the gap between the other car
                         and our car is less than 30 meters, set the flag */
-                    //}
+                    }
 /*                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                         target_car_right = true;
                     }    */                
@@ -222,6 +213,10 @@ int main() {
                 /* And if there is no car in the left side of the lane */
                 if (ego_lane > LEFT_LANE && !target_car_left) {
                     ego_lane--;
+                }
+                /* And if there is no car in the right side of the lane */
+                else if (ego_lane < RIGHT_LANE && !target_car_right) {
+                    ego_lane++;
                 }
 
             }
