@@ -177,18 +177,18 @@ int main() {
 
                     if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                         target_car_ahead = true;
-                    }
+     
+               }
                     else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 < check_target_s <  car_s + 30)) {
                         target_car_left = true;
                         /* If the car is in the right side and the the gap between the other car
                         and our car is less than 30 meters, set the flag */
                     }
- /*                   else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 < check_target_s < car_s + 30)) {
+                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 < check_target_s < car_s + 30)) {
                         target_car_right = true;
-                    }   */
+                    }   
                //}
             }
-
             if (target_car_ahead) {
                 ref_vel -= CONSTANT_VEL_VAL;
 
