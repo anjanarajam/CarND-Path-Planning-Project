@@ -140,23 +140,23 @@ int main() {
                 /* d value gives what lane other cars are in */
                 float d_target = sensor_fusion[i][6];
 
-                ///* Check in which lane the cars are present */
-                //if (d_target > 0 && d_target < 4) {
-                //    targer_car_lane = LEFT_LANE;
-                //}
-                //else if (d_target > 4 && d_target < 8) {
-                //    targer_car_lane = MIDDLE_LANE;
-                //}
-                //else if (d_target > 8 && d_target < 12) {
-                //    targer_car_lane = RIGHT_LANE;
-                //}
-                //else {
-                //    targer_car_lane = NO_LANE;
-                //}
+                /* Check in which lane the cars are present */
+                if (d_target > 0 && d_target < 4) {
+                    targer_car_lane = LEFT_LANE;
+                }
+                else if (d_target > 4 && d_target < 8) {
+                    targer_car_lane = MIDDLE_LANE;
+                }
+                else if (d_target > 8 && d_target < 12) {
+                    targer_car_lane = RIGHT_LANE;
+                }
+                else {
+                    targer_car_lane = NO_LANE;
+                }
 
                 /* Check if the other car is in ou\r lane(between +2 and -2 from the center point
                 of our middle lane ) and check how close it is to us */
-                if ((d_target < (2 + 4 * ego_lane + 2)) && (d_target > (2 + 4 * ego_lane - 2))) {
+                //if ((d_target < (2 + 4 * ego_lane + 2)) && (d_target > (2 + 4 * ego_lane - 2))) {
                     double vx_target = sensor_fusion[i][3];
                     double vy_target = sensor_fusion[i][4];
                     /* Speed is important to predict where the car would be
@@ -168,20 +168,20 @@ int main() {
 
                     /* What does the car look like in the future. For this we will use the speed of the car and the
                     previous path size.
-                     1) previous path point projects the current path of the simulator; prev_size = number of previous waypoints.
-                     2) .02 seconds = 20 milliseconds = time taken to reach the next waypoint
+                     2) .02 seconds = 20 milliseconds                     1) previous path point projects the current path of the simulator; prev_size = number of previous waypoints.
+ = time taken to reach the next waypoint
                      3) check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
                      4) prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
                      5) therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
                     check_target_s += ((double)prev_size * .02 * check_target_speed);
 
-                    if ((check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
+                    if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                         target_car_ahead = true;
                         //ref_vel = 29.5;
-                        
-                        if (ego_lane > 0) {
-                            ego_lane--;
-                        }
+                        //
+                        //if (ego_lane > 0) {
+                        //    ego_lane--;
+                        //}
                     }
 
                     if (target_car_ahead) {
