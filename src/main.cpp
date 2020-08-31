@@ -156,7 +156,7 @@ int main() {
 
                 /* Check if the other car is in ou\r lane(between +2 and -2 from the center point
                 of our middle lane ) and check how close it is to us */
-                //if ((d_target < (2 + 4 * ego_lane + 2)) && (d_target > (2 + 4 * ego_lane - 2))) {
+                if ((d_target < (2 + 4 * ego_lane + 2)) && (d_target > (2 + 4 * ego_lane - 2))) {
                     double vx_target = sensor_fusion[i][3];
                     double vy_target = sensor_fusion[i][4];
                     /* Speed is important to predict where the car would be
@@ -177,7 +177,7 @@ int main() {
 
                     if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                         target_car_ahead = true;
-                    } 
+                    }
                     else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                         target_car_left = true;
                         /* If the car is in the right side and the the gap between the other car
@@ -185,7 +185,7 @@ int main() {
                     }
                     //else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                     //    target_car_right = true;
-                    //}
+                }    //}
             }
 
             if (target_car_ahead) {
