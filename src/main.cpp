@@ -178,6 +178,10 @@ int main() {
                     if ((check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                         target_car_ahead = true;
                         //ref_vel = 29.5;
+                        
+                        if (ego_lane > 0) {
+                            ego_lane--;
+                        }
                     }
 
                     if (target_car_ahead) {
