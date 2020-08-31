@@ -141,28 +141,28 @@ int main() {
                 /* d value gives what lane other cars are in */
                 float d_target = sensor_fusion[i][6];
 
-                /* Check in which lane the cars are present */
-                if (d_target > 0 && d_target < 4) {
-                    targer_car_lane = LEFT_LANE;
-                }
-                else if (d_target > 4 && d_target < 8) {
-                    targer_car_lane = MIDDLE_LANE;
-                }
-                else if (d_target > 8 && d_target < 12) {
-                    targer_car_lane = RIGHT_LANE;
-                }
-                else {
-                    targer_car_lane = NO_LANE;
-                }
+                ///* Check in which lane the cars are present */
+                //if (d_target > 0 && d_target < 4) {
+                //    targer_car_lane = LEFT_LANE;
+                //}
+                //else if (d_target > 4 && d_target < 8) {
+                //    targer_car_lane = MIDDLE_LANE;
+                //}
+                //else if (d_target > 8 && d_target < 12) {
+                //    targer_car_lane = RIGHT_LANE;
+                //}
+                //else {
+                //    targer_car_lane = NO_LANE;
+                //}
 
                 /* Check if the other car is in ou\r lane(between +2 and -2 from the center point
                 of our middle lane ) and check how close it is to us */
-                if (d_target < (2 + 4 * ego_lane + 2) && d_target > (2 + 4 * ego_lane - 2)) {
+                if ((d_target < (2 + 4 * ego_lane + 2)) && (d_target > (2 + 4 * ego_lane - 2))) {
                     double vx_target = sensor_fusion[i][3];
                     double vy_target = sensor_fusion[i][4];
                     /* Speed is important to predict where the car would be
                     in future */
-                    double check_target_speed = sqrt(vx_target * vx_target + vy_target * vy_target);
+                    double check_target_speed = std::sqrt(vx_target * vx_target + vy_target * vy_target);
                     /* checks the s value of the other cars to check if they
                     are nearby */
                     double check_target_s = sensor_fusion[i][5];
@@ -177,7 +177,7 @@ int main() {
                     check_target_s += ((double)prev_size * .02 * check_target_speed);
 
                     if ((check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
-                        //ref_vel = 29.5;
+                        ref_vel = 29.5;
                     }
 
           //          /* If the car is in front of us and the the gap between the other car
