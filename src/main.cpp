@@ -182,29 +182,19 @@ int main() {
                         //if (ego_lane > 0) {
                         //    ego_lane--;
                         //}
-
-
                          /* And if there is no car in the left side of the lane */
                         if (ego_lane > LEFT_LANE && !target_car_left) {
                             ego_lane--;
                         }
-
-
-                    } else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
-                        target_car_left = true;
+                    } 
+                    //else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
+                    //    target_car_left = true;
                         /* If the car is in the right side and the the gap between the other car
                         and our car is less than 30 meters, set the flag */
-                    }
+                    //}
 /*                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 > check_target_s < car_s + 30)) {
                         target_car_right = true;
                     }    */                
-
-                    if (target_car_ahead) {
-                        ref_vel -= CONSTANT_VEL_VAL;
-
-                    } else if (ref_vel < MAX_VEL) {
-                        ref_vel += CONSTANT_VEL_VAL;
-                    }
 
 
 
@@ -225,6 +215,15 @@ int main() {
           //          }
                // }
             }
+
+            if (target_car_ahead) {
+                ref_vel -= CONSTANT_VEL_VAL;
+
+            }
+            else if (ref_vel < MAX_VEL) {
+                ref_vel += CONSTANT_VEL_VAL;
+            }
+
           //
           //
           /* Behavioral planning : what has to be done based on the predictions */
