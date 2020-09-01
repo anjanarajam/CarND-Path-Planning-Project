@@ -178,7 +178,7 @@ int main() {
                     if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                         target_car_ahead = true;
      
-               }
+                    }
                     else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 < check_target_s <  car_s + 30)) {
                         target_car_left = true;
                         /* If the car is in the right side and the the gap between the other car
@@ -189,8 +189,9 @@ int main() {
                     }   
                //}
             }
+
             if (target_car_ahead) {
-                ref_vel -= CONSTANT_VEL_VAL;
+                //ref_vel -= CONSTANT_VEL_VAL;
 
                 /* And if there is no car in the left side of the lane */
                 if (ego_lane > LEFT_LANE && !target_car_left) {
@@ -200,18 +201,26 @@ int main() {
                 else if (ego_lane < RIGHT_LANE && !target_car_right) {
                     ego_lane++;
                 }
+                else {
+                    ref_vel -= CONSTANT_VEL_VAL;
+                }
 
             }
             else {
-                if (ref_vel < MAX_VEL) {
-                    ref_vel += CONSTANT_VEL_VAL;
-                }
+                //if (ref_vel < MAX_VEL) {
+                //    ref_vel += CONSTANT_VEL_VAL;
+                //}
 
                 if (ego_lane != MIDDLE_LANE) {
                     if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
                         ego_lane = MIDDLE_LANE;
                     }
                 }
+
+                if (ref_vel < MAX_VEL) {
+                    ref_vel += CONSTANT_VEL_VAL;
+                }
+
             } 
 
           /* Create a widely spaced vector points spaced at 30m each, later we will
