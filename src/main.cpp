@@ -179,12 +179,12 @@ int main() {
                         target_car_ahead = true;
      
                     }
-                    else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 < check_target_s <  car_s + 30)) {
+                    else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30) {
                         target_car_left = true;
                         /* If the car is in the right side and the the gap between the other car
                         and our car is less than 30 meters, set the flag */
                     }
-                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 < check_target_s < car_s + 30)) {
+                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30) {
                         target_car_right = true;
                     }   
                //}
@@ -255,8 +255,6 @@ int main() {
               points_y.push_back(ref_y_prev);
               points_y.push_back(ref_y);
           }
-
-          std::cout << "Generating spline with lane: " << ego_lane << std::endl;
 
           std::vector<double> next_wp0 = getXY(car_s + 30, (2 + 4 * ego_lane), map_waypoints_s,
               map_waypoints_x, map_waypoints_y);
