@@ -134,8 +134,9 @@ int main() {
             bool target_car_left = false;
             bool target_car_right = false;
 
-            ///* Prediction - Get all the sensor fusion value of all the cars to know if there is any vehicle
-            //in the ego car's lane and the velocities of the other vehicles */
+            /* Prediction - Get all the sensor fusion value of all the cars to know if there is any vehicle
+            in the ego car's lane and the velocities of the other vehicles */
+
             for (int i = 0; i < sensor_fusion.size(); i++) {
                 /* d value gives what lane other cars are in */
                 float d_target = sensor_fusion[i][6];
@@ -154,9 +155,7 @@ int main() {
                     targer_car_lane = NO_LANE;
                 }
 
-                /* Check if the other car is in ou\r lane(between +2 and -2 from the center point
-                of our middle lane ) and check how close it is to us */
-
+                /* Get velocities of the target cars to determine how close they are to the ego vehicle */
                 double vx_target = sensor_fusion[i][3];
                 double vy_target = sensor_fusion[i][4];
                 /* Speed is important to predict where the car would be
@@ -166,30 +165,37 @@ int main() {
                 are nearby */
                 double check_target_s = sensor_fusion[i][5];
 
-                /* What does the car look like in the future. For this we will use the speed of the car and the
+                /* Behavior Planning - Gives direction to the ego vehicle based on the inputs of prediction */
+
+                /* Where will the target car be in the future? For this we will use the speed of the car and the
                 previous path size.
                 1) previous path point projects the current path of the simulator; prev_size = number of previous waypoints.
                 = time taken to reach the next waypoint
                 2) .02 seconds = 20 milliseconds                     
-                3) check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
-                4) prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
-                5) therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
+                3) check_target_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
+                4) prev_size * .02 * check_target_speed = total distance covered by the car currently in the simulator
+                5) therefore check_target_s += ((double)prev_size *.02 * check_target_speed) will be the future distance */
                 check_target_s += ((double)prev_size * .02 * check_target_speed);
 
+                /* If the car is in the same lane and the the gap between the other car
+                and our car is less than 30 meters, set the flag */
                 if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
                     target_car_ahead = true;
      
                 }
+                /* If the car is in the left side and the the gap between the other car
+                and our car is less than 30 meters, set the flag */
                 else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30)) {
                     target_car_left = true;
-                    /* If the car is in the right side and the the gap between the other car
-                    and our car is less than 30 meters, set the flag */
+                /* If the car is in the right side and the the gap between the other car
+                and our car is less than 30 meters, set the flag */
                 }
                 else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30)) {
                     target_car_right = true;
                 }   
             }
 
+            /* Change the ego vehicle's lane and velocity depending on the state machine */
             if (target_car_ahead) {
                 ref_vel -= CONSTANT_VEL_VAL;
 
@@ -213,6 +219,9 @@ int main() {
                     }
                 }
             } 
+
+          /* Trajectory Generation - Based on the directions given by planning, trajectory is 
+          generated for the car to move along */
 
           /* Create a widely spaced vector points spaced at 30m each, later we will
           interpolate these points with spline and fill in more points */
@@ -298,6 +307,7 @@ int main() {
           }
 
           /* calculate how to break up the 30m spaced spline points */
+
           /* Horizontal x axis */
           double target_x = 30;
           /* The vertical y value of corresponding x value */
