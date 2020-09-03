@@ -191,7 +191,7 @@ int main() {
             }
 
             if (target_car_ahead) {
-                //ref_vel -= CONSTANT_VEL_VAL;
+                ref_vel -= CONSTANT_VEL_VAL;
 
                 /* And if there is no car in the left side of the lane */
                 if (ego_lane > LEFT_LANE && !target_car_left) {
@@ -201,26 +201,18 @@ int main() {
                 else if (ego_lane < RIGHT_LANE && !target_car_right) {
                     ego_lane++;
                 }
-                else {
-                    ref_vel -= CONSTANT_VEL_VAL;
-                }
 
             }
             else {
-                //if (ref_vel < MAX_VEL) {
-                //    ref_vel += CONSTANT_VEL_VAL;
-                //}
+                if (ref_vel < MAX_VEL) {
+                    ref_vel += CONSTANT_VEL_VAL;
+                }
 
                 if (ego_lane != MIDDLE_LANE) {
                     if ((ego_lane == LEFT_LANE && !target_car_right) || (ego_lane == RIGHT_LANE && !target_car_left)) {
                         ego_lane = MIDDLE_LANE;
                     }
                 }
-
-                if (ref_vel < MAX_VEL) {
-                    ref_vel += CONSTANT_VEL_VAL;
-                }
-
             } 
 
           /* Create a widely spaced vector points spaced at 30m each, later we will
@@ -263,6 +255,8 @@ int main() {
               points_y.push_back(ref_y_prev);
               points_y.push_back(ref_y);
           }
+
+          std::cout << "Generating spline with lane: " << ego_lane << std::endl;
 
           std::vector<double> next_wp0 = getXY(car_s + 30, (2 + 4 * ego_lane), map_waypoints_s,
               map_waypoints_x, map_waypoints_y);
