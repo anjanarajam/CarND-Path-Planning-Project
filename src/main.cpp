@@ -73,7 +73,6 @@ int main() {
 
   /* Set some reference velocity in MPH - taken as 0, maximum being 49.5 */
   double ref_vel = 0.0f;
-  //double ref_vel = MAX_VEL;
 
   h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
                &map_waypoints_dx,&map_waypoints_dy, &ego_lane]
@@ -115,6 +114,7 @@ int main() {
             auto sensor_fusion = j[1]["sensor_fusion"];
 
             // My Code starts here  
+
             /* Get the size of the previous path vector. The simulator
             actually gives the previous path */
             int prev_size = previous_path_x.size();
@@ -156,38 +156,38 @@ int main() {
 
                 /* Check if the other car is in ou\r lane(between +2 and -2 from the center point
                 of our middle lane ) and check how close it is to us */
-                //if ((d_target < (2 + 4 * ego_lane + 2)) && (d_target > (2 + 4 * ego_lane - 2))) {
-                    double vx_target = sensor_fusion[i][3];
-                    double vy_target = sensor_fusion[i][4];
-                    /* Speed is important to predict where the car would be
-                    in future */
-                    double check_target_speed = std::sqrt(vx_target * vx_target + vy_target * vy_target);
-                    /* checks the s value of the other cars to check if they
-                    are nearby */
-                    double check_target_s = sensor_fusion[i][5];
 
-                    /* What does the car look like in the future. For this we will use the speed of the car and the
-                    previous path size.
-                     2) .02 seconds = 20 milliseconds                     1) previous path point projects the current path of the simulator; prev_size = number of previous waypoints.
- = time taken to reach the next waypoint
-                     3) check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
-                     4) prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
-                     5) therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
-                    check_target_s += ((double)prev_size * .02 * check_target_speed);
+                double vx_target = sensor_fusion[i][3];
+                double vy_target = sensor_fusion[i][4];
+                /* Speed is important to predict where the car would be
+                in future */
+                double check_target_speed = std::sqrt(vx_target * vx_target + vy_target * vy_target);
+                /* checks the s value of the other cars to check if they
+                are nearby */
+                double check_target_s = sensor_fusion[i][5];
 
-                    if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
-                        target_car_ahead = true;
+                /* What does the car look like in the future. For this we will use the speed of the car and the
+                previous path size.
+                1) previous path point projects the current path of the simulator; prev_size = number of previous waypoints.
+                = time taken to reach the next waypoint
+                2) .02 seconds = 20 milliseconds                     
+                3) check_speed = speed of the other car distance from one waypoint to other = .02 * check_speed
+                4) prev_size * .02 * check_speed = total distance covered by the car currently in the simulator
+                5) therefore check_car_s += ((double)prev_size *.02 * check_speed) will be the future distance */
+                check_target_s += ((double)prev_size * .02 * check_target_speed);
+
+                if ((targer_car_lane == ego_lane) && (check_target_s > car_s) && ((check_target_s - car_s) < 30)) {
+                    target_car_ahead = true;
      
-                    }
-                    else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30)) {
-                        target_car_left = true;
-                        /* If the car is in the right side and the the gap between the other car
-                        and our car is less than 30 meters, set the flag */
-                    }
-                    else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30)) {
-                        target_car_right = true;
-                    }   
-               //}
+                }
+                else if ((targer_car_lane == (ego_lane - 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30)) {
+                    target_car_left = true;
+                    /* If the car is in the right side and the the gap between the other car
+                    and our car is less than 30 meters, set the flag */
+                }
+                else if ((targer_car_lane == (ego_lane + 1)) && (car_s - 30 < check_target_s && check_target_s < car_s + 30)) {
+                    target_car_right = true;
+                }   
             }
 
             if (target_car_ahead) {
@@ -201,7 +201,6 @@ int main() {
                 else if (ego_lane < RIGHT_LANE && !target_car_right) {
                     ego_lane++;
                 }
-
             }
             else {
                 if (ref_vel < MAX_VEL) {
@@ -312,19 +311,11 @@ int main() {
           The other one(next_x_vals) is the previous path points which is filled in the spline after filling the 
           five anchor points */         
           for (int i = 1; i <= (50 - previous_path_x.size()); i++) {
-              //ref_vel += ego_speed_change;
-
-              //if (ref_vel > MAX_VEL) {
-              //    ref_vel = MAX_VEL;
-              //} else if (ref_vel < CONSTANT_VEL_VAL) {
-              //    ref_vel = CONSTANT_VEL_VAL;
-              //}
-
               /* Calculate distance between two points within target distance(hypotenuese) of 30m. Since it takes 20millisecond to
               move from one point to another, the distance between two points is*/
               /* Dividing by 2.24 since it has to m/sec; and 0.02 is 20milliseconds in seconds */
               double target_dist_points = (0.02 * ref_vel / 2.24);
-              /* Now claculate how many points within target distance(hypotenuese) of 30m. */
+              /* Now calculate how many points within target distance(hypotenuese) of 30m. */
               double N = (target_dist / target_dist_points);
               /* Now use these same N points to break x-axis or to calculate distance between two x points */
               double dist_target_x_points = (target_x) / N;
